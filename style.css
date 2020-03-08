@@ -1,0 +1,25 @@
+#map{
+    float: left;
+    margin-right: 100px;
+}
+
+.barra{
+    fill: #FF6347;
+}
+
+#leyenda{
+    position: absolute;
+    left: 800px;
+    top: 520px;
+    width: 600px;
+    height: 100px;
+    border-top: medium solid grey;
+}
+
+span{
+    font-size: 1.1em;
+}
+
+span.numero{
+    padding: 0px 45px;
+}
