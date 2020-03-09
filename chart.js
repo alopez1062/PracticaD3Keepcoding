@@ -52,8 +52,9 @@ function drawMap(featuresCollection){
         dataBarrio = [];
         for(let i = 0; i < d.properties.avgbedrooms.length; i++){
             console.log(d.properties.avgbedrooms[i])
-            dataBarrio.push(d.properties.avgbedrooms[i].total)
+            dataBarrio.push([i+1, d.properties.avgbedrooms[i].total])
         }
+        console.log(dataBarrio)
         deleteBarChart();
         drawBarchar();
     });
@@ -106,55 +107,56 @@ function drawMap(featuresCollection){
 }
 
 function drawBarchar(){
-    let rectWidth = 90
+    const width = 500;
     const height = 500;
-    if(dataBarrio.length == 0){
-        dataBarrio = [0,0,0,0,0]
-    }
-    const maxInput = d3.max(dataBarrio);
-    
-    const svgBar = d3.select("#bar")
-        .append('svg')
+    const barWidth = 40;
+    const sizeAxisX = 20;
+    const sizeAxisY = 20;
+    const xMax = d3.max(dataBarrio, (d) => d[0])
+    const yMax = d3.max(dataBarrio, (d) => d[1])
 
-    svgBar
+    const scaleX = d3.scaleLinear()
+        .domain([0, xMax + 1])
+        .range([sizeAxisY, width - 50]);
+
+    const scaleY = d3.scaleLinear()
+        .domain([0, yMax + 5])
+        .range([height - sizeAxisX, 0]);
+
+    const svg = d3.select("#bar")
+        .append("svg");
+
+    svg.attr("width", width)
+        .attr("height", height)
         .attr("id", "barchart")
-        .attr('width', 500)
-        .attr('height', 500)
 
-    const rect = svgBar
-        .selectAll('rect')
-        .data(dataBarrio)
-        .enter()
-        .append("rect")
-    
+    const rect = svg
+      .selectAll('rect')
+      .data(dataBarrio)
+      .enter()
+      .append("rect")
+
     rect
-        .attr("class", "barra")
-        .attr('x', positionX)
-        .attr('y', (d) => height - scale(d))
-        .attr('width', rectWidth)
-        .attr('height', d => scale(d));
+      .attr('x', (d) => scaleX(d[0]) - barWidth / 2)
+      .attr('y', (d) => scaleY(d[1]))
+      .attr('width', barWidth)
+      .attr('height', (d) => height - scaleY(d[1]) - sizeAxisX)
+      .attr("class", "barra");
 
-    const text = svgBar.selectAll("text")
-        .data(dataBarrio)
-        .enter()
-        .append('text');
 
-    text.text(d => d)
-        .attr("x", (d, i) => positionX(d, i) + 35)
-        .attr("y", (d) => positionY(d) - 3);
+    const xAxis = d3.axisBottom(scaleX).ticks(5).tickFormat(d => `${d} bedrooms`);
 
-    function scale(d){
-        const scaleNum = (height - 20) / maxInput;
-        return scaleNum * d;
-    }
+    const groupAxisX = svg.append("g");
 
-    function positionX(d, index){
-        return index * (rectWidth + 1)
-    }
+    groupAxisX
+        .attr("transform", `translate(0, ${height - sizeAxisX})`)
+        .call(xAxis)
 
-    function positionY(d){
-        return height - scale(d)
-    }
+    const yAxis = d3.axisRight(scaleY);
+    const groupAxisY = svg.append("g");
+    groupAxisY
+        //.attr("transform", `translate(0, ${height - sizeAxisX})`)
+        .call(yAxis)
 }
 
 function deleteBarChart(){
