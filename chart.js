@@ -120,7 +120,7 @@ function drawBarchar(){
         .range([sizeAxisY, width - 50]);
 
     const scaleY = d3.scaleLinear()
-        .domain([0, yMax + 5])
+        .domain([0, yMax + yMax / 10])
         .range([height - sizeAxisX, 0]);
 
     const svg = d3.select("#bar")
